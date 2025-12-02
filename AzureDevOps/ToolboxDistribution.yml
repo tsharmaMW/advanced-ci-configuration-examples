@@ -62,8 +62,9 @@ jobs:
       
       # The packaged toolbox is distributed as a GitHub release
       - task: GitHubRelease@1
+        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
         inputs:
-          gitHubConnection: advanced-ci-configuration-examples
+          gitHubConnection: tsharmaMW
           title: "Cross-Platform Array Product Toolbox"
           assets: 'toolbox.mltbx'
           tagSource: 'userSpecifiedTag'
