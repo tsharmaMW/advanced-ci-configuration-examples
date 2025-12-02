@@ -67,6 +67,6 @@ jobs:
           gitHubConnection: tsharmaMW
           title: "Cross-Platform Array Product Toolbox"
           assets: 'toolbox.mltbx'
-          tagSource: 'userSpecifiedTag'
+          tagSource: 'userSpecifiedTag' 
           tag: '$(Build.BuildNumber)'
     dependsOn: CompileAndTestMex
