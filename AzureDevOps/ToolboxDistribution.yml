@@ -53,7 +53,7 @@ jobs:
           flattenFolders: true
           targetFolder: 'toolbox'
       
-      # Packages all files in toolbox folder into a mltbx toolbox package
+      # Packages all files in toolbox folder into a mltbx toolbox package 
       - task: RunMATLABBuild@1
         inputs:
           tasks: packageToolbox
