@@ -71,7 +71,7 @@ jobs:
           pattern: mex-*
           merge-multiple: true
         
-      # Packages all files in toolbox folder into a mltbx toolbox package  
+      # Packages all files in toolbox folder into a mltbx toolbox package
       - name: Run MATLAB build
         uses: matlab-actions/run-build@v2
         with:
