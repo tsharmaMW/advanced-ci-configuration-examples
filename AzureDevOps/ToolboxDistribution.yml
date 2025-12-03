@@ -6,6 +6,11 @@ trigger:
     include:
       - 'v*'
 
+pr:
+  branches:
+    include:
+      - main
+
 jobs:
   # This job compiles MEX files and runs tests across different platforms
   - job: CompileAndTestMex
@@ -76,5 +81,5 @@ jobs:
           title: "Cross-Platform Array Product Toolbox"
           assets: 'toolbox.mltbx'
           tagSource: 'userSpecifiedTag'
-          tag: '$(Build.SourceBranchName)'
+          tag: '$(Build.SourceBranchName)-azure'
     dependsOn: CompileAndTestMex
