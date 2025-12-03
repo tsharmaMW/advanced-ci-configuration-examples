@@ -81,6 +81,6 @@ jobs:
       - name: Create release and upload asset
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          gh release create ${{github.ref_name}}-gh --title "Cross-Platform Array Product Toolbox" toolbox.mltbx
+          gh release create gh-${{github.ref_name}} --title "Cross-Platform Array Product Toolbox" toolbox.mltbx
         env:
           GH_TOKEN: ${{ github.token }}
