@@ -78,9 +78,9 @@ jobs:
           tasks: packageToolbox
 
       # The packaged toolbox is distributed as a GitHub release
-      - name: Create release and upload asset
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          gh release create ${{github.ref_name}} --title "Cross-Platform Array Product Toolbox" toolbox.mltbx
-        env:
-          GH_TOKEN: ${{ github.token }}
+      # - name: Create release and upload asset
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   run: |
+      #     gh release create ${{github.ref_name}} --title "Cross-Platform Array Product Toolbox" toolbox.mltbx
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
