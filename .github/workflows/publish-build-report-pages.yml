@@ -1,0 +1,94 @@
+name: MATLAB Build Report
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Run MATLAB build
+    runs-on: ubuntu-latest
+    outputs:
+      report-generated: ${{ steps.report.outputs.generated }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: latest # The -report build option requires R2026b or later
+
+      - name: Run build
+        uses: matlab-actions/run-build@v3
+        with:
+          # Until Run MATLAB Build has a dedicated report input, pass -report
+          # through build-options. The path is relative to the MATLAB startup
+          # folder, which is the repository root by default.
+          build-options: -report build-report
+
+      - name: Check for build report
+        id: report
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f build-report/index.html ]; then
+            echo "generated=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::No build report found at build-report/index.html"
+            echo "generated=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Keep a downloadable copy for every run, including pull requests,
+      # which cannot deploy to Pages.
+      - name: Upload build report artifact
+        if: ${{ !cancelled() && steps.report.outputs.generated == 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: matlab-build-report
+          path: build-report
+          retention-days: 14
+
+      - name: Upload build report for GitHub Pages
+        if: ${{ !cancelled() && steps.report.outputs.generated == 'true' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: build-report
+
+  deploy:
+    name: Publish build report
+    needs: build
+    # Run even if the build failed, but only on the default branch and only
+    # if the build produced a report.
+    if: ${{ !cancelled() && needs.build.outputs.report-generated == 'true' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+      - name: Link build report in job summary
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          {
+            echo "### MATLAB Build Report"
+            echo "[Open the build report]($PAGE_URL)"
+          } >> "$GITHUB_STEP_SUMMARY"
