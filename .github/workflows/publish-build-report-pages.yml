@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       report-generated: ${{ steps.report.outputs.generated }}
+      # Name the Pages artifact per run attempt. Re-running the build otherwise
+      # leaves two "github-pages" artifacts in the run, which deploy-pages rejects.
+      pages-artifact: github-pages-${{ github.run_attempt }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -57,6 +60,7 @@ jobs:
         if: ${{ !cancelled() && steps.report.outputs.generated == 'true' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
         uses: actions/upload-pages-artifact@v5
         with:
+          name: github-pages-${{ github.run_attempt }}
           path: build-report
 
   deploy:
@@ -83,6 +87,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: ${{ needs.build.outputs.pages-artifact }}
 
       - name: Link build report in job summary
         env:
